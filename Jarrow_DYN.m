@@ -14,7 +14,7 @@ D_bar = dbar*ones(J,1);
 N_bar = ones(J,1);  % Outside supplies
 
 n_iter = 50;        % No. of price iterations
-k_back = 0;         %no. of back steps
+k_back = 0;         % No. of back steps
 Iter = 1;           % Turn on price iterations
 dum_slack = 0;      %0 = shorting ban; 1 = no shorting ban;
 
