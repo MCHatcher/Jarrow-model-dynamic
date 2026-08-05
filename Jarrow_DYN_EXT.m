@@ -23,7 +23,7 @@ constrained_t = dum_sol_t;  Pop = NaN(T,K); Demands1 = Pop; Demands2 = Pop;
 Ptild = NaN(J,K); %Beliefs1 = Pop;  Beliefs2 = Pop;
 
 %Covariance matrix
-Var1 = 1; Var2 = 3; CV = -0.65*sqrt(3)*sqrt(1);  
+Var1 = 1; Var2 = 3; CV = -0.65*sqrt(Var1)*sqrt(Var2);  
 Omega_bar = [Var1 CV;CV Var2];   %vcov matrix
 V_bar = Omega_bar \ eye(2);
 V11 = [det(V_bar)/V_bar(2,2) 0; 0 0];
