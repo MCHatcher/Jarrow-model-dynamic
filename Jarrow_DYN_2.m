@@ -24,7 +24,7 @@ Diff = NaN(T,1); Pop = NaN(T,K); Demands1 = Pop; Demands2 = Pop;
 %Beliefs1 = Pop;  Beliefs2 = Pop;
 
 %Covariance matrix
-Var1 = 1; Var2 = 3; CV = -0.65*sqrt(3);  
+Var1 = 1; Var2 = 3; CV = -0.65**sqrt(Var1)*sqrt(Var2);  
 Omega_bar = [Var1 CV;CV Var2];   %vcov matrix
 
 V_bar = Omega_bar \ eye(2);
