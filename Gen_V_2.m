@@ -1,4 +1,4 @@
-% Gen_V_2
+% Gen_V_2_FAST
 
 V = NaN(2,2,K); V11 = V; Omega = V; %V_tild = V; V11_tild = V;
 
@@ -7,7 +7,7 @@ for q=1:K
     if q==1
         V(:,:,q) = V_bar;
     elseif q>1
-        V(:,:,q) = V_bar + -0.025 + 0.05*rand(2,2);
+        V(:,:,q) = V_bar + [-0.025 + 0.05*rand 0; 0 0];
         V(1,2,q) = V_bar(1,2);
         V(2,1,q) = V(1,2,q); V(2,2,q) = V_bar(2,2); 
     end

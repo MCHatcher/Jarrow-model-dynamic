@@ -1,14 +1,14 @@
 %Constrained_CASE_1_EXT_2.m
 
+Prod = NaN(2,K);
+
 for k=k_init:K
 
     set12 = k:K;
     B11 = 1:k-1;
 
     V_sum = sum(V_tild(:,:,set12),3) + sum(V11_tild(:,:,B11),3); 
-    
-    Prod = NaN(2,length(set12));
-
+   
     for q = 1:K
         if q < k
             Prod(:,q) = V11_tild(:,:,q)*F(:,q);
@@ -36,17 +36,17 @@ for k=k_init:K
 end
 
 if dum_sol ~= 1
-
+    
     back = 1;
+
+    Prod = NaN(2,K);
 
     for k=k_init-1:-1:2    
 
     set12 = k:K;
     B11 = 1:k-1;
 
-        V_sum = sum(V_tild(:,:,set12),3) + sum(V11_tild(:,:,B11),3); 
-    
-    Prod = NaN(2,length(set12));
+    V_sum = sum(V_tild(:,:,set12),3) + sum(V11_tild(:,:,B11),3); 
 
     for q = 1:K
         if q < k

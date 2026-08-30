@@ -3,7 +3,7 @@
 
 clc, clear
 
-K = 1E6;          % No. of investors
+K = 1E4;          % No. of investors
 J = 2;             % No. of markets
 T = 50;            % No. of periods
 
@@ -26,7 +26,6 @@ Ptild = NaN(J,K); %Beliefs1 = Pop;  Beliefs2 = Pop;
 Var1 = 1; Var2 = 3; CV = -0.65*sqrt(Var1)*sqrt(Var2);  
 Omega_bar = [Var1 CV;CV Var2];   %vcov matrix
 V_bar = Omega_bar \ eye(2);
-V11_bar = [det(V_bar)/V_bar(2,2) 0; 0 0];
 
 Pf = ( D_bar - Omega_bar*N_bar )/r;  %Fundamental price vector
 
@@ -40,13 +39,11 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
-T_l = max(100,T);
-sigma_d  = 0.01;  
-pd = makedist('Normal','mu',0,'sigma',sigma_d);  %Truncated normal distribution
-pd_t = truncate(pd,-dbar,dbar);
-shock1 = random(pd_t,T_l,1); 
-shock2 = random(pd_t,T_l,1); 
-shock = [shock1'; shock2'];
+mu = [0 0];
+Sigma = Omega_bar/(100^2);
+draws = mvnrnd(mu,Sigma,T);
+shock = draws(:,:); 
+shock = shock';
 %NB. For timed sims, set 'tic' below this line
 
 %-------------------------------

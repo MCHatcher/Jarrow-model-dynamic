@@ -3,7 +3,7 @@
 
 clc, clear
 
-K = 1E5;          % No. of investors
+K = 1E4;          % No. of investors
 J = 2;             % No. of markets
 T = 50;            % No. of periods
 
@@ -19,8 +19,8 @@ Iter = 1;           % Turn on price iterations
 dum_slack = 0;      %0 = shorting ban; 1 = no shorting ban;
 
 Investors = 1:K; dum_sol_t = zeros(T,1); slack_t = dum_sol_t; back_t = dum_sol_t; 
-constrained_t = dum_sol_t;  Pop = NaN(T,K); Demands1 = Pop; Demands2 = Pop;
-Ptild = NaN(J,K); %Beliefs1 = Pop;  Beliefs2 = Pop;
+constrained_t = dum_sol_t; Demands1 = NaN(T,K); Demands2 = Demands1; %Pop = Demands1;
+Ptild = NaN(J,T); %Beliefs1 = Pop;  Beliefs2 = Pop;
 
 %Covariance matrix
 Var1 = 1; Var2 = 3; CV = -0.65*sqrt(Var1)*sqrt(Var2);  
@@ -31,8 +31,8 @@ V11 = [det(V_bar)/V_bar(2,2) 0; 0 0];
 Pf = ( D_bar - Omega_bar*N_bar )/r;  %Fundamental price vector
 
 %Price beliefs
-g = 0.805*ones(1,K) + linspace(0,0.3,K); C = zeros(1,K); b = C;
-%b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
+g = 0.805*ones(1,K) + linspace(0,0.3,K); C = zeros(1,K); %
+% b = C; b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
 
 g(1:round(K/2)) = linspace(0,0.2,round(K/2));  C(1:round(K/2)) = 1-g(1:round(K/2));
 rng(3)
@@ -40,21 +40,20 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
-T_l = max(100,T);
-sigma_d  = 0.01;  
-pd = makedist('Normal','mu',0,'sigma',sigma_d);  %Truncated normal distribution
-pd_t = truncate(pd,-dbar,dbar);
-shock1 = random(pd_t,T_l,1); 
-shock2 = random(pd_t,T_l,1); 
-shock = [shock1'; shock2'];
+mu = [0 0];
+Sigma = Omega_bar/(100^2);
+draws = mvnrnd(mu,Sigma,T);
+shock = draws(:,:); 
+shock = shock';
 %NB. For timed sims, set 'tic' below this line
 
 %-------------------------------
 %Initial values and predictors 
 %-------------------------------
-n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar + ones(2,1)*b;
+n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar;   %n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar + ones(2,1)*b;
+
 %c = linspace(0.9,1.1,K); c = c(randperm(K)); %Scaling coefficients
-c0 = 0.9 + 0.2*rand(1,K); c0(1)=1;
+c0 = 0.95 + 0.1*rand(1,K); c0(1)=1;
 Ptild0 = [2;8];
 
 tic

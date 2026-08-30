@@ -3,7 +3,7 @@
 
 clc, clear
 
-K = 1E4;          % No. of investors
+K = 1000;          % No. of investors
 J = 2;             % No. of markets
 T = 50;            % No. of periods
 
@@ -16,11 +16,11 @@ N_bar = ones(J,1);  % Outside supplies
 n_iter = 50;        % No. of price iterations
 k_back = 0;         
 Iter = 1;           % Turn on price iterations
-dum_slack = 1;      %0 = shorting ban; 1 = no shorting ban;
+dum_slack = 0;      %0 = shorting ban; 1 = no shorting ban;
 
 Investors = 1:K; dum_sol_t = zeros(T,1); slack_t = dum_sol_t; back_t = dum_sol_t; 
 constrained_t = dum_sol_t; constrained1_t = dum_sol_t; constrained2_t = dum_sol_t;
-Diff = NaN(T,1); Pop = NaN(T,K); Demands1 = Pop; Demands2 = Pop;
+Diff = NaN(T,1); Demands1 = NaN(T,K); Demands2 = Demands1; %Pop = Demands1;
 %Beliefs1 = Pop;  Beliefs2 = Pop;
 
 %Covariance matrix
@@ -34,8 +34,8 @@ V22 = [0 0; 0 det(V_bar)/V_bar(1,1)];
 Pf = ( D_bar - Omega_bar*N_bar )/r;  %Fundamental price vector
 
 %Price beliefs
-g = 0.805*ones(1,K) + linspace(0,0.285,K); C = zeros(1,K); b = C;
-%b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
+g = 0.805*ones(1,K) + linspace(0,0.285,K); C = zeros(1,K); 
+%b = C; b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
 
 g(1:round(K/2)) = linspace(0,0.2,round(K/2));  C(1:round(K/2)) = 1-g(1:round(K/2));
 rng(3)
@@ -43,21 +43,19 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
-T_l = max(100,T);
-sigma_d  = 0.01;  
-pd = makedist('Normal','mu',0,'sigma',sigma_d);  %Truncated normal distribution
-pd_t = truncate(pd,-dbar,dbar);
-shock1 = random(pd_t,T_l,1); 
-shock2 = random(pd_t,T_l,1); 
-shock = [shock1'; shock2'];
+mu = [0 0];
+Sigma = Omega_bar/(100^2);
+draws = mvnrnd(mu,Sigma,T);
+shock = draws(:,:); 
+shock = shock';
 %NB. For timed sims, set 'tic' below this line
 
 %-------------------------------
 %Initial values and predictors 
 %-------------------------------
-n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar + ones(2,1)*b;
+n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar;  %Constant = Omega_bar*N_bar + ones(2,1)*b;
 %c = linspace(0.9,1.1,K); c = c(randperm(K)); %Scaling coefficients
-c0 = 0.9 + 0.2*rand(1,K); c0(1)=1;
+c0 = 0.95 + 0.1*rand(1,K); c0(1)=1;
 Ptild0 = [2;8]; 
 
 tic
@@ -96,12 +94,13 @@ c = c0(Index);
 CASE_2_pos_EXT
 
 constrained_t(t) = constrained;
-%constrained1_t(t) = length( setdiff(Investors,B12_star) ) -length(B22_star);
-%constrained2_t(t) = length( setdiff(Investors,B12_star) ) -length(B11_star);
+%constrained1_t(t) = length( setdiff(Investors,B12) ) -length(B22);
+%constrained2_t(t) = length( setdiff(Investors,B12) ) -length(B11);
 
 dum_sol_t(t) = dum_sol;
 slack_t(t) = slack;
 
+%Can comment out for speed
 Diff(t)=0;
 if sum( abs( Index - Index2 ) ) > 0 && slack == 0
     Diff(t)=1;

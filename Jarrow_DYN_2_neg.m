@@ -2,9 +2,9 @@
 
 clc, clear
 
-K = 100;          % No. of investors
+K = 10;          % No. of investors
 J = 2;             % No. of markets
-T = 10;            % No. of periods
+T = 50;            % No. of periods
 
 r = 0.01;          % Riskfree rate 
 betta = 0.125;         % Intensity of choice
@@ -18,7 +18,7 @@ Iter = 1;           % Turn on price iterations
 dum_slack = 0;      %0 = shorting ban; 1 = no shorting ban;
 
 Investors = 1:K; dum_sol_t = zeros(T,1); slack_t = dum_sol_t; back_t = dum_sol_t; 
-constrained_t = dum_sol_t; Diff = NaN(T,1); Pop = NaN(T,K); Demands1 = Pop; Demands2 = Pop;
+constrained_t = dum_sol_t; Diff = NaN(T,1); Demands1 = NaN(T,K); Demands2 = Demands1; %Pop = Demands1;
 %Beliefs1 = Pop;  Beliefs2 = Pop;
 
 %Covariance matrix
@@ -32,8 +32,8 @@ V22 = [0 0; 0 det(V_bar)/V_bar(1,1)];
 Pf = ( D_bar - Omega_bar*N_bar )/r;  %Fundamental price vector
 
 %Price beliefs
-g = 0.805*ones(1,K) + linspace(0,0.285,K); C = zeros(1,K); b = C;
-%b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
+g = 0.805*ones(1,K) + linspace(0,0.285,K); C = zeros(1,K); 
+%b = C; b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
 
 g(1:round(K/2)) = linspace(0,0.2,round(K/2));  C(1:round(K/2)) = 1-g(1:round(K/2));
 rng(3)
@@ -41,19 +41,17 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
-T_l = max(100,T);
-sigma_d  = 0.01;  
-pd = makedist('Normal','mu',0,'sigma',sigma_d);  %Truncated normal distribution
-pd_t = truncate(pd,-dbar,dbar);
-shock1 = random(pd_t,T_l,1); 
-shock2 = random(pd_t,T_l,1); 
-shock = [shock1'; shock2'];
+mu = [0 0];
+Sigma = Omega_bar/(100^2);
+draws = mvnrnd(mu,Sigma,T);
+shock = draws(:,:); 
+shock = shock';
 %NB. For timed sims, set 'tic' below this line
 
 %-------------------------------
 %Initial values and predictors 
 %-------------------------------
-n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar + ones(2,1)*b;
+n_init = 1/K*ones(1,K); Constant = Omega_bar*N_bar;  %Constant = Omega_bar*N_bar + ones(2,1)*b;
 Ptild0 = [7;-12];
 
 tic
@@ -92,11 +90,11 @@ dum_sol = 0; slack = 0; back = 0; constrained = 0;
         
         if Ptild0(1)*Ptild0(2) >= 0 
 
-            Ind = 1; run CASE_2_pos.m
+            Ind = 1; CASE_2_pos
 
         elseif Ptild0(1)*Ptild0(2) < 0
 
-            Ind = 0; run CASE_2_neg.m
+            Ind = 0; CASE_2_neg
 
         end
 
@@ -106,11 +104,11 @@ dum_sol = 0; slack = 0; back = 0; constrained = 0;
 
         if Ptild(1,t-1)*Ptild(2,t-1) >= 0 
 
-            Ind = 1; run CASE_2_pos.m
+            Ind = 1; CASE_2_pos
 
         elseif Ptild(1,t-1)*Ptild(2,t-1) < 0
 
-            Ind = 0; run CASE_2_neg.m
+            Ind = 0; CASE_2_neg
         end
 
     end
@@ -143,8 +141,8 @@ if min_Demands1<0 && min_Demands2<0 && dum_slack==0
 end
 
 figure(1)
-subplot(1,2,1),  plot(Ptild(1,:)), xlabel('Periods'),  title('Asset 1 price: P_1'), hold on 
-subplot(1,2,2),  plot(Ptild(2,:)), xlabel('Periods'),  title('Asset 2 price: P_2'), hold on, %plot(constrained_t/K), hold on,
+subplot(1,2,1),  plot(Ptild(1,:)), xlabel('Time, t'),  title('Asset 1 price: P_1'), hold on 
+subplot(1,2,2),  plot(Ptild(2,:)), xlabel('Time, t'),  title('Asset 2 price: P_2'), hold on, %plot(constrained_t/K), hold on,
 
 
 

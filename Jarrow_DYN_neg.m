@@ -40,13 +40,11 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
-T_l = max(100,T);
-sigma_d  = 0.01;  
-pd = makedist('Normal','mu',0,'sigma',sigma_d);  %Truncated normal distribution
-pd_t = truncate(pd,-dbar,dbar);
-shock1 = random(pd_t,T_l,1); 
-shock2 = random(pd_t,T_l,1); 
-shock = [shock1'; shock2'];
+mu = [0 0];
+Sigma = Omega_bar/(100^2);
+draws = mvnrnd(mu,Sigma,T);
+shock = draws(:,:); 
+shock = shock';
 %NB. For timed sims, set 'tic' below this line
 
 %-------------------------------
