@@ -1,4 +1,4 @@
-% Insert_1_EXT
+% Insert_1_EXT.m
 
 FV_sum = V_bar*[ n_prod(set12)*F(1,set12)' ; n_prod(set12)*F(2,set12)' ] + V11*[ n_prod(B11)*F(1,B11)' ; n_prod(B11)*F(2,B11)' ];
 V_sum = sum(n_prod(set12))*V_bar + sum(n_prod(B11))*V11;

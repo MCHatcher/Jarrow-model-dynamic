@@ -3,7 +3,7 @@
 
 clc, clear
 
-K = 1000;          % No. of investors
+K = 100;          % No. of investors
 J = 2;             % No. of markets
 T = 50;            % No. of periods
 
@@ -20,8 +20,8 @@ dum_slack = 0;      %0 = shorting ban; 1 = no shorting ban;
 
 Investors = 1:K; dum_sol_t = zeros(T,1); slack_t = dum_sol_t; back_t = dum_sol_t; 
 constrained_t = dum_sol_t; constrained1_t = dum_sol_t; constrained2_t = dum_sol_t;
-Diff = NaN(T,1); Demands1 = NaN(T,K); Demands2 = Demands1; %Pop = Demands1;
-%Beliefs1 = Pop;  Beliefs2 = Pop;
+Diff = NaN(T,1); Demands1 = NaN(T,K); Demands2 = Demands1; Pop = Demands1;
+dummy = 0; %Beliefs1 = Pop;  Beliefs2 = Pop;
 
 %Covariance matrix
 Var1 = 1; Var2 = 3; CV = -0.65*sqrt(Var1)*sqrt(Var2);  
@@ -34,7 +34,7 @@ V22 = [0 0; 0 det(V_bar)/V_bar(1,1)];
 Pf = ( D_bar - Omega_bar*N_bar )/r;  %Fundamental price vector
 
 %Price beliefs
-g = 0.805*ones(1,K) + linspace(0,0.285,K); C = zeros(1,K); 
+g = 0.80*ones(1,K) + linspace(0,0.29,K); C = zeros(1,K); 
 %b = C; b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
 
 g(1:round(K/2)) = linspace(0,0.2,round(K/2));  C(1:round(K/2)) = 1-g(1:round(K/2));
@@ -43,9 +43,10 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
+T_sim = max(T,100);
 mu = [0 0];
 Sigma = Omega_bar/(100^2);
-draws = mvnrnd(mu,Sigma,T);
+draws = mvnrnd(mu,Sigma,T_sim);
 shock = draws(:,:); 
 shock = shock';
 %NB. For timed sims, set 'tic' below this line
@@ -65,15 +66,15 @@ for t=1:T
     % Compute population shares
 
     if t==1
-        F = Constant + (1/(1+r))*[g*Ptild0(1); g*Ptild0(2)];
+        F = Constant + [g*Ptild0(1); g*Ptild0(2)];
         mult = V_bar*F; [~,Index] = sort(mult(1,:)); [~,Index2] = sort(mult(2,:));
         n = n_init; 
     elseif t==2
-        F = Constant + (1/(1+r))*[g*Ptild(1,t-1); g*Ptild(2,t-1)];
+        F = Constant + [g*Ptild(1,t-1); g*Ptild(2,t-1)];
         mult = V_bar*F; [~,Index] = sort(mult(1,:)); [~,Index2] = sort(mult(2,:));
         n = n_init;
     elseif t>=3
-        F = Constant + (1/(1+r))*[g*Ptild(1,t-1); g*Ptild(2,t-1)];
+        F = Constant + [g*Ptild(1,t-1); g*Ptild(2,t-1)];
          mult = V_bar*F; [~,Index] = sort(mult(1,:)); [~,Index2] = sort(mult(2,:));
 
         R1 = Ptild(1,t-1) - (1+r)*Ptild(1,t-2) + Constant(1) + shock(1,t-1);
@@ -82,10 +83,17 @@ for t=1:T
         U = R1*Demands1(t-2,:) + R2*Demands2(t-2,:) - C;
         exp_U = exp(betta*U);
         n = transpose(exp_U)/sum(exp_U); n = n(Index); n = n';
+        if anynan(n)
+            n = Pop(t-1,:); dummy = t; break
+        end
+    end
+
+    if dummy>0
+        break
     end
 
     F = [F(1,Index); F(2,Index)]; Index1 = Index; 
-    %Pop(t,:) = n; Beliefs1(t,:) = F(1,:); Beliefs2(t,:) = F(2,:);  
+    Pop(t,:) = n; %Beliefs1(t,:) = F(1,:); Beliefs2(t,:) = F(2,:);  
   
 
 dum_sol = 0; slack = 0; back = 0; 

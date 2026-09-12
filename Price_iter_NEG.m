@@ -7,6 +7,7 @@ P_guess = ( V_sum \ eye(2) )*( FV_sum  - N_bar ); P_g(:,1) = P_guess;
 Demands_guess = V_bar*( F(:,Investors) - P_guess );
 k_con1 = nnz(Demands_guess(1,:)<0); k_con2 = nnz(Demands_guess(2,:)<0);
 k_con = max(k_con1,k_con2); k_con = max(k_con,1);
+k_con_lag = k_con;
 
 for jj=2:n_iter
 
@@ -21,6 +22,12 @@ for jj=2:n_iter
     if max( abs(P_g(:,jj)-P_g(:,jj-1)) )  / max(abs(P_g(:,jj-1))) < 1e-4
         break
     end
+
+    %if k_con - k_con_lag == 0
+    %    break
+    %end
+
+    k_con_lag = k_con;
 
 end
 

@@ -1,4 +1,4 @@
-% Gen_V_2_FAST
+% Gen_V_2_FAST.m
 
 V = NaN(2,2,K); V11 = V; Omega = V; %V_tild = V; V11_tild = V;
 

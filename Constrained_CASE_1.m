@@ -7,7 +7,7 @@ for k=k_init:K
 
     FV_sum = V_bar*[ n(set12)*F(1,set12)' ; n(set12)*F(2,set12)' ] + V11*[ n(B11)*F(1,B11)' ; n(B11)*F(2,B11)' ];
     V_sum = sum(n(set12))*V_bar + sum(n(B11))*V11;
-                
+          
     F_bar = ( V_sum \ eye(2) )*FV_sum;
     N_hat =  ( V_sum \ eye(2) )*N_bar;
 

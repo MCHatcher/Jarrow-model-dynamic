@@ -1,4 +1,4 @@
-% Insert_2
+% Insert_2.m
 
 FV_sum = V_bar*[ n(set12)*F(1,set12)' ; n(set12)*F(2,set12)' ] + V22*[ n(B22)*F(1,B22)' ; n(B22)*F(2,B22)' ];
 V_sum = sum(n(set12))*V_bar + sum(n(B22))*V22;

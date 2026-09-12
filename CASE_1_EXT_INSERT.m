@@ -14,13 +14,12 @@ P_guess = ( V_sum \ eye(2) )*( FV_sum  - N_bar );
 Demands_guess = c.*( V_bar*( F - P_guess ) );  
 min_slack = min(Demands_guess(2,:));
 
-Demands_opt = NaN(2,K); 
+%Demands_opt = NaN(2,K); 
 
 
     if min_slack >= 0 || dum_slack==1
         dum_sol = 1;
         P_tild = P_guess;
-        Ptild(:,t) = P_guess;
         slack = 1; constrained = 0;
         
         set_out = []; B11 = set_out; B22 = set_out;
@@ -34,14 +33,13 @@ Demands_opt = NaN(2,K);
         k_init = max(2,k_con-k_back);
 
         if Iter==1
-            Price_iter_CASE_1
+            Price_iter_CASE_1_EXT
         end
 
         Constrained_CASE_1_EXT
 
             if dum_sol==1
                 P_tild = P_guess;
-                Ptild(:,t) = P_tild;
                 constrained = k-1; set_out = []; 
                 
                 Demands_opt = c.*( V_bar*( F(:,Investors) - P_tild ) );
@@ -61,6 +59,8 @@ Demands_opt = NaN(2,K);
 
         Demands1(t,:) = Demands_opt(1,Index);
         Demands2(t,:) = Demands_opt(2,Index);
+
+        Ptild(:,t) = P_tild/(1+r);
                 
 
 

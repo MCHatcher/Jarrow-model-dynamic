@@ -3,7 +3,7 @@
 
 clc, clear
 
-K = 1E4;          % No. of investors
+K = 100;          % No. of investors
 J = 2;             % No. of markets
 T = 50;            % No. of periods
 
@@ -30,7 +30,7 @@ V_bar = Omega_bar \ eye(2);
 Pf = ( D_bar - Omega_bar*N_bar )/r;  %Fundamental price vector
 
 %Price beliefs
-g = 0.805*ones(1,K) + linspace(0,0.3,K); C = zeros(1,K); b = C;
+g = 0.8056*ones(1,K) + linspace(0,0.3,K); C = zeros(1,K); b = C;
 %b(1:round(K/2)) = linspace(-0.1,0.1,round(K/2));
 
 g(1:round(K/2)) = linspace(0,0.2,round(K/2));  C(1:round(K/2)) = 1-g(1:round(K/2));
@@ -39,9 +39,10 @@ rng(3)
 %--------------------------
 %Generate dividend shocks 
 %--------------------------
+T_sim = max(T,100);
 mu = [0 0];
 Sigma = Omega_bar/(100^2);
-draws = mvnrnd(mu,Sigma,T);
+draws = mvnrnd(mu,Sigma,T_sim);
 shock = draws(:,:); 
 shock = shock';
 %NB. For timed sims, set 'tic' below this line
@@ -60,17 +61,17 @@ for t=1:T
     % Compute population shares
 
     if t==1
-        F = Constant + (1/(1+r))*[g*Ptild0(1); g*Ptild0(2)];
+        F = Constant + [g*Ptild0(1); g*Ptild0(2)];
         mult = V_bar*F; [~,Index] = sort(mult(2,:));
         F = [F(1,Index); F(2,Index)];
         n = n_init; 
     elseif t==2
-        F = Constant + (1/(1+r))*[g*Ptild(1,t-1); g*Ptild(2,t-1)];
+        F = Constant + [g*Ptild(1,t-1); g*Ptild(2,t-1)];
         mult = V_bar*F; [~,Index] = sort(mult(2,:));
         F = [F(1,Index); F(2,Index)];
         n = n_init;
     elseif t>=3
-        F = Constant + (1/(1+r))*[g*Ptild(1,t-1); g*Ptild(2,t-1)];
+        F = Constant + [g*Ptild(1,t-1); g*Ptild(2,t-1)];
         mult = V_bar*F; [~,Index] = sort(mult(2,:));
         F = [F(1,Index); F(2,Index)];
 

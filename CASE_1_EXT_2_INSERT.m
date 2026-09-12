@@ -28,7 +28,6 @@ min_slack = Demands_guess(2,1);
     if min_slack >= 0 || dum_slack==1
         dum_sol = 1;
         P_tild = P_guess;
-        Ptild(:,t) = P_guess;
         slack = 1; constrained = 0;
         
         set_out = []; B11 = set_out; B22 = set_out;
@@ -54,7 +53,6 @@ min_slack = Demands_guess(2,1);
 
             if dum_sol==1
                 P_tild = P_guess;
-                Ptild(:,t) = P_tild;
                 constrained = k-1;  
 
                 B11 = 1:k-1; 
@@ -83,7 +81,7 @@ min_slack = Demands_guess(2,1);
                 Demands1(t,:) = Demands_opt(1,Index);
                 Demands2(t,:) = Demands_opt(2,Index);
 
-    
+                Ptild(:,t) = P_tild/(1+r);
         
 
 
